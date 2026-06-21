@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.log
+
+# Node (if added later)
+node_modules/
+dist/
+.next/
+
+# 3D Models (too large for git — use Git LFS or host separately)
+frontend/models/*.glb
+frontend/models/*.gltf
+frontend/models/*.bin
+
+# Build artifacts
+*.zip

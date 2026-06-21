@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galactic Shipyard — Premium Space Parts Store</title>
+<link rel="stylesheet" href="css/main.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Loader ring animation */
+.loader-ring {
+  width: 32px; height: 32px;
+  border: 2px solid rgba(0,229,255,0.15);
+  border-top-color: rgba(0,229,255,0.8);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="audio-toggle" id="audio-toggle" title="Toggle Sound"><span>♪</span></div>
+
+<nav id="main-nav">
+  <div class="nav-logo">⬡ GALACTIC SHIPYARD</div>
+  <div class="nav-links">
+    <div class="nav-link active" data-page="home">HOME</div>
+    <div class="nav-link" data-page="catalog">CATALOG</div>
+    <div class="nav-link" data-page="hangar">HANGAR</div>
+    <div class="nav-link" data-page="command">COMMAND</div>
+    <div class="nav-link" data-page="profile">PROFILE</div>
+    <div class="nav-link" data-page="cargo">
+      CARGO<span class="badge" id="cart-count">0</span>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-status">
+      <span class="status-dot"></span>
+      <span class="status-text">ONLINE</span>
+    </div>
+    <button class="nav-btn" id="btn-connect">◈ CONNECT</button>
+    <button class="nav-btn purple" id="btn-profile">▸ PROFILE</button>
+  </div>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="page-home" class="page active">
+  <section id="hero">
+    <div class="hero-scan-lines"></div>
+    <canvas id="ship-canvas"></canvas>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        SECTOR 7-G · CORUSCANT ORBIT · LIVE
+      </div>
+      <div class="hero-title">
+        <div class="line-white">GALACTIC</div>
+        <div class="line-gradient">SHIPYARD</div>
+      </div>
+      <p class="hero-sub">
+        The galaxy's premier marketplace for starship components,
+        hyperdrive systems &amp; military-grade modifications
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-val" id="stat-parts">0</span>
+          <span class="stat-label">Parts Available</span>
+        </div>
+        <div class="stat">
+          <span class="stat-val" id="stat-ships">0</span>
+          <span class="stat-label">Ship Models</span>
+        </div>
+        <div class="stat">
+          <span class="stat-val" id="stat-sectors">0</span>
+          <span class="stat-label">Sectors Served</span>
+        </div>
+      </div>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="showPage('catalog')">◈ BROWSE CATALOG</button>
+        <button class="btn-secondary" onclick="showPage('hangar')">▸ ENTER HANGAR</button>
+      </div>
+    </div>
+
+    <div class="ship-hud">
+      <div class="hud-item">STATUS <span class="hud-val green">OPERATIONAL</span></div>
+      <div class="hud-item">SHIELDS <span class="hud-val green">92%</span></div>
+      <div class="hud-item">HYPERDRIVE <span class="hud-val orange">CHARGING</span></div>
+      <div class="hud-item">SECTOR <span class="hud-val">7-G</span></div>
+      <div class="hud-item">INVENTORY <span class="hud-val">LIVE</span></div>
+      <div class="hud-item">CREDITS <span class="hud-val">∞</span></div>
+    </div>
+  </section>
+
+  <div class="page-content">
+    <section class="section reveal">
+      <div class="section-header">
+        <div class="section-tag">Featured Inventory</div>
+        <div class="section-title">PRIME COMPONENTS</div>
+      </div>
+      <div class="products-grid" id="featured-grid"></div>
+    </section>
+
+    <section class="section reveal">
+      <div class="features-strip">
+        <div class="feature-item">
+          <div class="feature-icon">◈</div>
+          <div class="feature-title">INSTANT DELIVERY</div>
+          <div class="feature-desc">Hyperspace courier network across all sectors</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">⬡</div>
+          <div class="feature-title">CERTIFIED PARTS</div>
+          <div class="feature-desc">All components verified by galactic engineers</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">◎</div>
+          <div class="feature-title">SECURE CREDITS</div>
+          <div class="feature-desc">Encrypted galactic credit transactions</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">◇</div>
+          <div class="feature-title">24/7 SUPPORT</div>
+          <div class="feature-desc">Holographic support across all time zones</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- CATALOG PAGE -->
+<div id="page-catalog" class="page">
+  <div class="page-content padded">
+    <div class="section-header">
+      <div class="section-tag">Full Inventory</div>
+      <div class="section-title">PARTS CATALOG</div>
+    </div>
+    <div class="catalog-controls">
+      <div class="search-box">
+        <span class="search-icon">◈</span>
+        <input type="text" id="search-input" placeholder="SEARCH COMPONENTS..." class="search-input">
+      </div>
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-cat="all">ALL PARTS</button>
+        <button class="filter-btn" data-cat="drive">DRIVES</button>
+        <button class="filter-btn" data-cat="weapon">WEAPONS</button>
+        <button class="filter-btn" data-cat="shield">SHIELDS</button>
+        <button class="filter-btn" data-cat="sensor">SENSORS</button>
+        <button class="filter-btn" data-cat="hull">HULL</button>
+      </div>
+    </div>
+    <div class="products-grid" id="catalog-grid"></div>
+  </div>
+</div>
+
+<!-- HANGAR PAGE -->
+<div id="page-hangar" class="page">
+  <div class="page-content padded">
+    <div class="section-header">
+      <div class="section-tag">Interactive Bay</div>
+      <div class="section-title">SHIP HANGAR</div>
+    </div>
+    <div class="hangar-layout">
+      <div class="hangar-viewport">
+        <canvas id="hangar-canvas"></canvas>
+        <div class="hangar-overlay-tl">DRAG TO ROTATE</div>
+        <div class="hangar-overlay-br" id="hangar-ship-name">X-WING T-65B</div>
+      </div>
+      <div class="hangar-panel">
+        <div class="panel-section">
+          <div class="panel-label">SELECT VESSEL</div>
+          <div id="ship-list" class="ship-list"></div>
+        </div>
+        <div class="panel-section">
+          <div class="panel-label">SYSTEM NODES</div>
+          <div id="node-list" class="node-list"></div>
+        </div>
+        <div class="panel-section" id="node-parts-section" style="display:none">
+          <div class="panel-label">COMPATIBLE PARTS</div>
+          <div id="node-parts" class="node-parts"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMAND PAGE -->
+<div id="page-command" class="page">
+  <div class="page-content padded">
+    <div class="section-header">
+      <div class="section-tag">Operations Hub</div>
+      <div class="section-title">GALACTIC COMMAND CENTER</div>
+    </div>
+    <div class="command-grid">
+      <div class="cmd-card"><div class="cmd-icon">◈</div><div class="cmd-val">1,247</div><div class="cmd-label">Total Orders</div><div class="cmd-change up">▲ +12% this cycle</div></div>
+      <div class="cmd-card"><div class="cmd-icon">◎</div><div class="cmd-val">48.2K</div><div class="cmd-label">Credits Spent</div><div class="cmd-change up">▲ +8% this cycle</div></div>
+      <div class="cmd-card"><div class="cmd-icon">⬡</div><div class="cmd-val">89</div><div class="cmd-label">Saved Ships</div><div class="cmd-change neutral">— stable</div></div>
+      <div class="cmd-card"><div class="cmd-icon">◇</div><div class="cmd-val rank">BOUNTY</div><div class="cmd-label">Pilot Rank</div><div class="cmd-change up">▲ Approaching SMUGGLER</div></div>
+    </div>
+    <div class="rank-section reveal">
+      <div class="section-tag" style="margin-bottom:1rem">Rank Progress</div>
+      <div class="rank-bar-container">
+        <div class="rank-labels">
+          <span>ROOKIE</span><span>BOUNTY</span><span>SMUGGLER</span><span>PILOT</span><span>ACE</span><span>LEGEND</span>
+        </div>
+        <div class="rank-bar">
+          <div class="rank-fill" style="width:35%"></div>
+          <div class="rank-marker" style="left:35%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="section-header reveal" style="margin-top:3rem">
+      <div class="section-tag">Mission Log</div>
+      <div class="section-title">ACHIEVEMENTS</div>
+    </div>
+    <div class="achievements-grid reveal" id="achievements-grid"></div>
+    <div class="section-header reveal" style="margin-top:3rem">
+      <div class="section-tag">History</div>
+      <div class="section-title">ORDER LOG</div>
+    </div>
+    <div class="order-table reveal">
+      <div class="order-row header"><span>ORDER ID</span><span>PART</span><span>DATE</span><span>STATUS</span><span>CREDITS</span></div>
+      <div class="order-row"><span>#GS-00441</span><span>Ion Drive MK-IX</span><span>12 BBY</span><span class="status-badge ok">DELIVERED</span><span>4,200</span></div>
+      <div class="order-row"><span>#GS-00389</span><span>Quad Laser Array</span><span>14 BBY</span><span class="status-badge ok">DELIVERED</span><span>8,900</span></div>
+      <div class="order-row"><span>#GS-00312</span><span>Deflector GX</span><span>16 BBY</span><span class="status-badge warn">IN TRANSIT</span><span>12,400</span></div>
+      <div class="order-row"><span>#GS-00271</span><span>Hyperdrive Class-1</span><span>18 BBY</span><span class="status-badge ok">DELIVERED</span><span>31,000</span></div>
+      <div class="order-row"><span>#GS-00190</span><span>Sensor Array LR</span><span>20 BBY</span><span class="status-badge crit">DELAYED</span><span>6,700</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CARGO PAGE -->
+<div id="page-cargo" class="page">
+  <div class="page-content padded cargo-layout">
+    <div class="cargo-main">
+      <div class="section-header">
+        <div class="section-tag">Loading Bay</div>
+        <div class="section-title">CARGO MANIFEST</div>
+      </div>
+      <div class="cargo-panel">
+        <div class="cargo-header">
+          <span class="cargo-title">◈ ACTIVE CARGO</span>
+          <span class="cargo-count" id="cargo-count-label">0 ITEMS</span>
+        </div>
+        <div class="cargo-items" id="cargo-items">
+          <div class="cargo-empty" id="cargo-empty">
+            <div class="empty-icon">◎</div>
+            <div>Cargo hold is empty</div>
+            <button class="btn-secondary" style="margin-top:1rem" onclick="showPage('catalog')">BROWSE CATALOG</button>
+          </div>
+        </div>
+        <div class="load-animation" id="load-anim">
+          <div class="load-block"></div><div class="load-block"></div>
+          <div class="load-block"></div><div class="load-block"></div>
+          <div class="load-block"></div>
+        </div>
+        <div class="cargo-bar"><div class="cargo-bar-fill" id="cargo-bar-fill"></div></div>
+        <div class="cargo-footer">
+          <div class="cargo-total">
+            <span class="total-label">Total Credits</span>
+            <span class="total-val" id="cargo-total">0 CR</span>
+          </div>
+          <button class="btn-primary full-width" id="checkout-btn">◈ INITIATE TRANSFER</button>
+        </div>
+      </div>
+    </div>
+    <div class="cargo-sidebar">
+      <div class="section-header">
+        <div class="section-tag">Summary</div>
+        <div class="section-title">ORDER SPECS</div>
+      </div>
+      <div class="order-specs">
+        <div class="spec-card"><div class="spec-card-label">Destination Sector</div><div class="spec-card-val">CORUSCANT · D-7</div></div>
+        <div class="spec-card"><div class="spec-card-label">Delivery ETA</div><div class="spec-card-val">2 CYCLES</div></div>
+        <div class="spec-card"><div class="spec-card-label">Shipping Class</div><div class="spec-card-val">PRIORITY HAULER</div></div>
+        <div class="spec-card"><div class="spec-card-label">Security Level</div><div class="spec-card-val" style="color:var(--green)">CLEARANCE A</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- PROFILE PAGE -->
+<div id="page-profile" class="page">
+</div>
+
+<div id="toast" class="toast"></div>
+
+<footer>
+  <div class="footer-logo">GALACTIC SHIPYARD · EST. 3 ABY</div>
+  <div class="footer-links">
+    <span>CONTRACTS</span><span>BOUNTIES</span><span>ABOUT</span><span>CONTACT</span>
+  </div>
+  <div class="footer-coords">COORDS: 0.0001°N · 0.0001°E · SECTOR ALPHA</div>
+</footer>
+
+<!-- Three.js core -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- GLTFLoader для загрузки .glb файлов -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<script src="js/auth.js"></script>
+<script src="js/data.js"></script>
+<script src="js/three-scenes.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

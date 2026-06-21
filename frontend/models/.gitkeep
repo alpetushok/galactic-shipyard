@@ -1,0 +1,9 @@
+# Place your .glb ship models here.
+# Files are excluded from git (see .gitignore) because of size.
+# Use Git LFS or host separately (S3, Cloudflare R2, etc.)
+#
+# Expected files:
+#   star_destroyer.glb
+#   x_wing.glb
+#   death_star.glb
+#   tie_interceptor.glb
