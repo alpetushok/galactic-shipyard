@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════
 
 /* ── PAGE ROUTER ── */
-const PAGE_IDS = ['home', 'catalog', 'hangar', 'command', 'cargo', 'profile'];
+const PAGE_IDS = ['home', 'catalog', 'hangar', 'command', 'cargo', 'profile', 'game'];
 let currentPage = 'home';
 let heroInited = false;
 let hangarInited = false;
@@ -68,6 +68,10 @@ function showPage(name) {
 
     case 'profile':
       renderProfilePage();
+      break;
+
+    case 'game':
+      enterGame();
       break;
   }
 }
@@ -195,6 +199,58 @@ setTimeout(() => {
     }, i * 80);
   });
 }, 300);
+
+/* ── GAME ENTRY / EXIT ── */
+let _gameInited = false;
+let _cachedXWingModel = null;
+
+function enterGame() {
+  const locked = document.getElementById('game-locked');
+  // Check if user has a ship (X-Wing free for registered users)
+  const hasShip = !Auth.isLoggedIn() ? false : true; // Logged-in users always have X-Wing
+
+  if (!hasShip) {
+    if (locked) locked.style.display = 'flex';
+    return;
+  }
+  if (locked) locked.style.display = 'none';
+
+  if (_gameInited) return; // already running
+  _gameInited = true;
+
+  const canvas = document.getElementById('game-canvas');
+  if (!canvas || !window.THREE) return;
+
+  // Try to reuse already-loaded X-Wing GLB
+  const xwingShip = SHIPS.find(s => s.id === 2 && s.glb);
+  if (xwingShip && window.THREE && THREE.GLTFLoader) {
+    const loader = new THREE.GLTFLoader();
+    loader.load(xwingShip.glb,
+      gltf => { SpaceGame.init(canvas, gltf.scene); },
+      null,
+      () => { SpaceGame.init(canvas, null); } // fallback: procedural ship
+    );
+  } else {
+    SpaceGame.init(canvas, null);
+  }
+
+  canvas.addEventListener('mousemove', e => SpaceGame.onMouseMove(e));
+
+  // ESC to exit
+  document.addEventListener('keydown', _gameEscHandler);
+  window.addEventListener('resize', () => SpaceGame.resize());
+}
+
+function _gameEscHandler(e) {
+  if (e.code === 'Escape' && currentPage === 'game') exitGame();
+}
+
+function exitGame() {
+  SpaceGame.destroy();
+  _gameInited = false;
+  document.removeEventListener('keydown', _gameEscHandler);
+  showPage('home');
+}
 
 console.log('%c⬡ GALACTIC SHIPYARD v1.0.0', 'color:#00E5FF;font-family:monospace;font-size:14px;font-weight:bold');
 console.log('%cCORUSCANT SECTOR · ALL SYSTEMS NOMINAL', 'color:#4A7B9D;font-family:monospace;font-size:10px');

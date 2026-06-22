@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 import os
 
-from app.db.database import get_db, User, Order, PilotRank
+from app.db.database import get_db, User, Order, UserShip, PilotRank
 
 router = APIRouter()
 
@@ -39,6 +39,7 @@ class UserOut(BaseModel):
     rank:          str
     credits_spent: float
     total_orders:  int = 0
+    owned_ships:   list[int] = []   # ship IDs
     created_at:    datetime
 
     class Config:
@@ -68,6 +69,12 @@ async def _get_user_out(db: AsyncSession, user: User) -> UserOut:
         select(func.count()).where(Order.user_id == user.id)
     )
     total_orders = result.scalar() or 0
+    # Get owned ship IDs
+    ships_res = await db.execute(
+        select(UserShip.ship_id).where(UserShip.user_id == user.id, UserShip.is_active == True)
+    )
+    owned_ships = [row[0] for row in ships_res.fetchall()]
+
     return UserOut(
         id=user.id,
         username=user.username,
@@ -75,6 +82,7 @@ async def _get_user_out(db: AsyncSession, user: User) -> UserOut:
         rank=user.rank,
         credits_spent=user.credits_spent,
         total_orders=total_orders,
+        owned_ships=owned_ships,
         created_at=user.created_at,
     )
 
@@ -127,6 +135,15 @@ async def register(payload: UserRegister, db: AsyncSession = Depends(get_db)):
     db.add(user)
     await db.flush()
     await db.refresh(user)
+
+    # 🎁 Give free X-Wing to every new pilot
+    free_ship = UserShip(
+        user_id=user.id,
+        ship_id=2,
+        ship_name="T-65 X-WING",
+    )
+    db.add(free_ship)
+    await db.flush()
 
     user_out = await _get_user_out(db, user)
     return Token(

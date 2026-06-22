@@ -33,6 +33,7 @@
     <div class="nav-link" data-page="catalog">CATALOG</div>
     <div class="nav-link" data-page="hangar">HANGAR</div>
     <div class="nav-link" data-page="command">COMMAND</div>
+    <div class="nav-link" data-page="game">⬡ FLY</div>
     <div class="nav-link" data-page="profile">PROFILE</div>
     <div class="nav-link" data-page="cargo">
       CARGO<span class="badge" id="cart-count">0</span>
@@ -286,6 +287,107 @@
 
 <div id="toast" class="toast"></div>
 
+<!-- GAME PAGE -->
+<div id="page-game" class="page">
+  <canvas id="game-canvas"></canvas>
+
+  <!-- HUD -->
+  <div id="game-hud">
+    <!-- Corner brackets -->
+    <div class="hud-corner tl"></div>
+    <div class="hud-corner tr"></div>
+    <div class="hud-corner bl"></div>
+    <div class="hud-corner br"></div>
+
+    <!-- Top bar -->
+    <div class="hud-top">
+      <div class="hud-logo">⬡ GALACTIC SHIPYARD · FLIGHT SIM</div>
+      <div class="hud-esc-hint" onclick="exitGame()">[ ESC ] EXIT</div>
+      <div class="hud-mode-badge" id="hud-mode">IDLE</div>
+    </div>
+
+    <!-- Crosshair -->
+    <div class="hud-crosshair"><div class="crosshair-dot"></div></div>
+
+    <!-- Status bars -->
+    <div class="hud-bottom-left">
+      <div class="hud-bar-row">
+        <span class="hud-bar-label">HULL</span>
+        <div class="hud-bar-track"><div class="hud-bar-fill" id="bar-health" style="width:100%"></div></div>
+        <span class="hud-bar-val" id="hud-health">100%</span>
+      </div>
+      <div class="hud-bar-row">
+        <span class="hud-bar-label">SHIELDS</span>
+        <div class="hud-bar-track"><div class="hud-bar-fill" id="bar-shields" style="width:100%;background:var(--cyan)"></div></div>
+        <span class="hud-bar-val" id="hud-shields">100%</span>
+      </div>
+      <div class="hud-bar-row">
+        <span class="hud-bar-label">FUEL</span>
+        <div class="hud-bar-track"><div class="hud-bar-fill" id="bar-fuel" style="width:100%;background:var(--blue)"></div></div>
+        <span class="hud-bar-val" id="hud-fuel">100%</span>
+      </div>
+      <div class="hud-bar-row">
+        <span class="hud-bar-label">SPEED</span>
+        <div class="hud-bar-track"><div class="hud-bar-fill" id="bar-speed" style="width:0%"></div></div>
+        <span class="hud-bar-val" id="hud-speed">0%</span>
+      </div>
+    </div>
+
+    <!-- Center speed -->
+    <div class="hud-bottom-center">
+      <div class="hud-speed-display" id="hud-speed-big">0</div>
+      <div class="hud-speed-label">VELOCITY</div>
+      <div class="hud-coords">COORDS <span id="hud-coords">0 : 0</span></div>
+    </div>
+
+    <!-- Bottom right -->
+    <div class="hud-bottom-right">
+      <div class="hud-nearest-label">NEAREST BODY</div>
+      <div class="hud-nearest-name" id="hud-nearest">—</div>
+      <div class="hud-fuel-badge">FUEL <span id="hud-fuel-pct">100%</span></div>
+    </div>
+
+    <!-- Warp panel -->
+    <div class="hud-warp-panel">
+      <div class="hud-warp-title">⚡ WARP TO</div>
+      <button class="warp-btn" onclick="SpaceGame.warpTo('TATOOINE')">TATOOINE</button>
+      <button class="warp-btn" onclick="SpaceGame.warpTo('CORUSCANT')">CORUSCANT</button>
+      <button class="warp-btn" onclick="SpaceGame.warpTo('HOTH')">HOTH</button>
+      <button class="warp-btn" onclick="SpaceGame.warpTo('MUSTAFAR')">MUSTAFAR</button>
+      <button class="warp-btn" onclick="SpaceGame.warpTo('BESPIN')">BESPIN</button>
+      <button class="warp-btn" onclick="SpaceGame.warpTo('ENDOR')">ENDOR</button>
+      <button class="warp-btn" onclick="SpaceGame.warpTo('DAGOBAH')">DAGOBAH</button>
+      <button class="warp-btn" onclick="SpaceGame.warpTo('GALACTIC SHIPYARD STATION')">🚀 STATION</button>
+    </div>
+
+    <!-- Controls hint -->
+    <div class="hud-controls-hint">
+      <div class="ctrl-row"><span class="ctrl-key">W/S</span> Throttle</div>
+      <div class="ctrl-row"><span class="ctrl-key">A/D</span> Yaw</div>
+      <div class="ctrl-row"><span class="ctrl-key">Q/E</span> Roll</div>
+      <div class="ctrl-row"><span class="ctrl-key">MOUSE</span> Pitch</div>
+      <div class="ctrl-row"><span class="ctrl-key">SHIFT</span> Boost</div>
+    </div>
+  </div>
+
+  <!-- Death overlay -->
+  <div id="game-death">
+    <div class="death-title">SHIP DESTROYED</div>
+    <div id="game-death-reason">UNKNOWN CAUSE</div>
+  </div>
+
+  <!-- Locked overlay (shown when no ship owned) -->
+  <div id="game-locked" style="display:none">
+    <div class="game-locked-icon">🔒</div>
+    <div class="game-locked-title">NO SHIP REGISTERED</div>
+    <div class="game-locked-sub">
+      You need to own a ship to enter the flight simulator.<br>
+      Register an account and claim your free X-Wing.
+    </div>
+    <button class="btn-primary" onclick="exitGame();showPage('profile')">◈ GET YOUR SHIP</button>
+  </div>
+</div>
+
 <!-- PROFILE PAGE -->
 <div id="page-profile" class="page">
 </div>
@@ -306,6 +408,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
 <script src="js/auth.js"></script>
+<script src="js/game.js"></script>
 <script src="js/data.js"></script>
 <script src="js/three-scenes.js"></script>
 <script src="js/ui.js"></script>

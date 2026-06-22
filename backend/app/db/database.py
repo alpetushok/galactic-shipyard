@@ -105,6 +105,21 @@ class User(Base):
     created_at:   Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     orders: Mapped[List["Order"]] = relationship("Order", back_populates="user")
+    ships: Mapped[List["UserShip"]] = relationship("UserShip", back_populates="user")
+
+
+class UserShip(Base):
+    """Ships owned by a user."""
+    __tablename__ = "user_ships"
+
+    id:         Mapped[int]  = mapped_column(Integer, primary_key=True)
+    user_id:    Mapped[int]  = mapped_column(ForeignKey("users.id"))
+    ship_id:    Mapped[int]  = mapped_column(Integer)          # matches SHIPS[].id in frontend
+    ship_name:  Mapped[str]  = mapped_column(String(120))
+    is_active:  Mapped[bool] = mapped_column(Boolean, default=True)
+    acquired_at:Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+    user: Mapped["User"] = relationship("User", back_populates="ships")
 
 
 class Order(Base):
